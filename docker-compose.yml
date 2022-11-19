@@ -1,16 +1,31 @@
-version: "3.7"
+version: '3'
 services:
-  postgres:
-    image: postgres:14
+  db:
+    image: postgres:14.3
+    restart: always
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+    container_name: challenge-none
+
+  # app:
+  #   build: .
+  #   command: "sh -c 'npm install && npm run start:dev'"
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - .:/home/node/app
+  
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.3
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+    restart: unless-stopped  
   kafka:
     image: confluentinc/cp-enterprise-kafka:5.5.3
     depends_on: [zookeeper]
