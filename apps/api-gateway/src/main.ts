@@ -13,6 +13,6 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   await app.listen(3000);
-  console.log('running server pppp');
+  console.log('running server api-gateway');
 }
 bootstrap();

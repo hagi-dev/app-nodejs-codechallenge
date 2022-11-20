@@ -6,6 +6,12 @@ import { Transport, ClientsModule } from '@nestjs/microservices';
 import { TransactionService } from './transaction.service';
 import { Transaction } from './entities/transaction.entity';
 import { TransactionRepository } from './repository/transaction.repository';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+
+const { DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, DB_PORT, DB_SYNC } =
+  process.env;
 
 @Module({
   imports: [
@@ -24,27 +30,16 @@ import { TransactionRepository } from './repository/transaction.repository';
         },
       },
     ]),
-    // TypeOrmModule.forRoot({
-    //   type: 'mysql',
-    //   host: 'localhost',
-    //   port: 3306,
-    //   username: 'root',
-    //   password: 'toor',
-    //   database: 'transaction',
-    //   entities: [__dirname + '/**/.entity(. ts, .js)'],
-    //   synchronize: true,
-    // }),
-    // TypeOrmModule.forFeature([Transaction, TypeTransaction]),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT),
-      username: 'postgres',
-      password: `postgres`,
-      database: 'transaction',
+      host: DB_HOST,
+      port: parseInt(DB_PORT),
+      username: DB_USER,
+      password: DB_PASSWORD,
+      database: DB_NAME,
       autoLoadEntities: true,
       entities: [Transaction],
-      synchronize: true,
+      synchronize: !!DB_SYNC,
     }),
     TypeOrmModule.forFeature([Transaction]),
   ],
