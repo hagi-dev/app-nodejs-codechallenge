@@ -22,9 +22,8 @@
 ```bash
 ## Inplementation
 1. npm install
-2. docker-compose up 
-3. touch .env
-## el .env tiene que estar contenido con:
+2. touch .env
+## the .env has to be contained with
 ##example:
 # - DB_USER=postgres
 # - DB_PASSWORD=postgres
@@ -33,8 +32,9 @@
 # - DB_PORT=5432
 # - DB_SYNC=true 
 
+3. docker-compose up 
 # execute proyect
-$ nest start port-services
+$ nest start api-gateway
 $ nest start transaction
 $ nest start anti-fraud
 ```
