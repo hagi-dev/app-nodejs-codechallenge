@@ -1,12 +1,9 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { from, Observable, of } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Transaction } from './entities/transaction.entity';
 import { ResponseTransactionCreate } from './type/reponseType';
-import { TypeTransferChange, status } from './type/typeTransaction';
 import { TransactionRepository } from './repository/transaction.repository';
 
 @Injectable()
@@ -25,47 +22,52 @@ export class TransactionService {
   async createTransaction(
     data: CreateTransactionDto,
   ): Promise<Observable<ResponseTransactionCreate[]>> {
-    console.log('create transaction', data);
     const transaction: Transaction = await this.transactionRepository.create(
       data,
     );
-    console.log('create transaction ouput', transaction);
-    const tranferTypeId = data.tranferTypeId;
-    const pattern = 'verify';
-    const payload = JSON.stringify(data.value);
-    await this.atifraudService
-      .send<number>(pattern, payload)
-      .subscribe((res) => {
-        transaction.transactionStatus = res;
-        console.log('create transaction varify', res);
-        this.update(transaction.transactionExternalId, transaction);
-      });
-    //TypeTransactionRepository
-    const dataResponse: ResponseTransactionCreate[] = [
-      {
-        transactionExternalId: transaction.transactionExternalId,
-        transactionType: {
-          name: tranferTypeId == 1 ? 'Debit' : 'Credit',
-        },
-        transactionStatus: {
-          name: transaction.transactionStatus === 1 ? 'Approved' : 'Rejected',
-        },
-        value: transaction.value,
-        createdAt: transaction.createdAt,
-      },
-    ];
-    return from([dataResponse]);
+    return this.validate_transaction(transaction);
   }
 
   async update(transactionExternalId: string, data: CreateTransactionDto) {
     await this.transactionRepository.update(transactionExternalId, data);
   }
 
-  findAll() {
-    return `This action returns all transaction`;
+  validate_transaction(
+    transaction: Transaction,
+  ): Observable<ResponseTransactionCreate[]> {
+    const pattern = 'verify';
+    const payload = JSON.stringify(transaction.value);
+    return this.atifraudService.send<number>(pattern, payload).pipe(
+      map((res) => {
+        transaction.transactionStatus = res;
+        this.update(transaction.transactionExternalId, transaction);
+        return this.formatResponseTransaction(res, transaction);
+      }),
+    );
   }
 
-  hello() {
-    return 'jako nepe jala tripas';
+  formatResponseTransaction(
+    status: number,
+    transaction: Transaction,
+  ): ResponseTransactionCreate[] {
+    const formatResponseTransaction = {
+      transactionExternalId: transaction.transactionExternalId,
+      transactionType: {
+        name: transaction.tranferTypeId == 1 ? 'Debit' : 'Credit',
+      },
+      transactionStatus: {
+        name: status == 1 ? 'Approved' : 'Rejected',
+      },
+      value: transaction.value,
+      createdAt: transaction.createdAt,
+    };
+    return [formatResponseTransaction];
+  }
+
+  async findOnBy(transactionExternalId: string): Promise<Transaction> {
+    const transaction = this.transactionRepository.findOne(
+      transactionExternalId,
+    );
+    return transaction;
   }
 }

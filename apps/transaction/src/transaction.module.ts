@@ -40,7 +40,7 @@ import { TransactionRepository } from './repository/transaction.repository';
       host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT),
       username: 'postgres',
-      password: 'postgres',
+      password: `postgres`,
       database: 'transaction',
       autoLoadEntities: true,
       entities: [Transaction],

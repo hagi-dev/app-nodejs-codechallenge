@@ -1,13 +1,11 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { Guid } from 'guid-typescript';
 import { status } from '../type/typeTransaction';
-import internal from 'stream';
 
 @Entity()
 export class Transaction {
-  @PrimaryColumn({
+  @PrimaryGeneratedColumn('uuid', {
     name: 'transactionExternalId',
-    default: () => Guid.create(),
   })
   transactionExternalId: string;
 
@@ -34,14 +32,14 @@ export class Transaction {
 
   @Column({
     name: 'transactionStatus',
-    default: () => status.PENDING,
+    default: status.PENDING,
   })
   transactionStatus: number;
 
   @Column({
     name: 'createdAt',
     type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
+    default: new Date(),
   })
   createdAt: Date;
 }

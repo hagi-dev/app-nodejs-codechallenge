@@ -1,5 +1,6 @@
 // import { Controller, Get, Post, Body, Logger, Inject } from '@nestjs/common';
 // import { TransactionService } from './transaction.service';
+import { Transaction } from './entities/transaction.entity';
 // import { CreateTransactionDto } from './dto/create-transaction.dto';
 // import {
 //   ClientKafka,
@@ -61,16 +62,11 @@ import { TransactionService } from './transaction.service';
 
 @Controller()
 export class TransactionController {
-  private readonly transactionService: TransactionService;
+  constructor(private readonly transactionService: TransactionService) {}
 
-  @EventPattern('create.reply')
+  @EventPattern('createTransactionDb.reply')
   logReply(data: ResponseTransactionCreate[]): void {
     Logger.log(data);
-  }
-
-  @MessagePattern('sum')
-  accumulate(data: number[]): Observable<number[]> {
-    return from([data]);
   }
 
   @MessagePattern('createTransactionDb')

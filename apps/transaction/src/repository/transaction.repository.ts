@@ -18,11 +18,16 @@ export class TransactionRepository {
   async update(
     transactionExternalId: string,
     updateTransactionDto: CreateTransactionDto,
-  ){
+  ) {
     updateTransactionDto.transactionExternalId = transactionExternalId;
     await this.transactionRepository.update(
       transactionExternalId,
       updateTransactionDto,
     );
+  }
+  findOne(transactionExternalId: string): Promise<Transaction> {
+    return this.transactionRepository.findOneBy({
+      transactionExternalId: transactionExternalId,
+    });
   }
 }

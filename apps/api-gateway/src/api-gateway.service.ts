@@ -11,15 +11,8 @@ export class ApiGatewayService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    this.gatewayService.subscribeToResponseOf('sum');
     this.gatewayService.subscribeToResponseOf('createTransactionDb');
     await this.gatewayService.connect();
-  }
-
-  accumulate(): Observable<number> {
-    const pattern = 'sum';
-    const payload = [1, 2, 3];
-    return this.gatewayService.send<number>(pattern, payload);
   }
 
   createTransaction(data: DataCreate): Observable<ResponseTransactionCreate> {
@@ -29,9 +22,5 @@ export class ApiGatewayService implements OnModuleInit {
       pattern,
       payload,
     );
-  }
-
-  getHello(): string {
-    return 'Hello World!';
   }
 }
